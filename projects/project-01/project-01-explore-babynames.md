@@ -31,12 +31,28 @@ library(tidyverse)
 # Read the csv file `file_name_names` as data frame `tbl_names`
 file_name_names <- here::here("data/names.csv.gz")
 tbl_names <- readr::read_csv(
-  file = ___, 
+  file = `file_name_names`, 
   show_col_types = FALSE
 )
 
 # Print `tbl_names`
+tbl_names
 ```
+
+    #> # A tibble: 2,052,781 × 4
+    #>     year name      sex   nb_births
+    #>    <dbl> <chr>     <chr>     <dbl>
+    #>  1  1880 Mary      F          7065
+    #>  2  1880 Anna      F          2604
+    #>  3  1880 Emma      F          2003
+    #>  4  1880 Elizabeth F          1939
+    #>  5  1880 Minnie    F          1746
+    #>  6  1880 Margaret  F          1578
+    #>  7  1880 Ida       F          1472
+    #>  8  1880 Alice     F          1414
+    #>  9  1880 Bertha    F          1320
+    #> 10  1880 Sarah     F          1288
+    #> # ℹ 2,052,771 more rows
 
 ### Question 1: \[Popular Names\] What are the most popular names?
 
@@ -56,21 +72,38 @@ names of the decade starting in 2011.
 ``` r
 tbl_names_popular = tbl_names |> 
   # Keep ROWS for year > 2010 and <= 2020
-  filter(year > ___, ___ <= ___) |> 
+  filter(year > 2010, year <= 2020) |> 
   # Group by sex and name
-  group_by(___, ___) |> 
+  group_by(sex, name) |> 
   # Summarize the number of births
   summarize(
-    nb_births = ___(nb_births),
+    nb_births = sum(nb_births),
+    # for every sex and name, we want to sum the number of births
     .groups = "drop"
+    # best practice to add this. you have 2 groups, sex and name. when u summarize, you will still group by sex w/o .groups='drop'
   ) |> 
   # Group by sex 
-  ___(___) |>  
+  group_by(sex) |>  
   # For each sex, keep the top 5 rows by number of births
-  slice_max(___, n = ___)
+  slice_max(nb_births, n = 5)
 
 tbl_names_popular
 ```
+
+    #> # A tibble: 10 × 3
+    #> # Groups:   sex [2]
+    #>    sex   name     nb_births
+    #>    <chr> <chr>        <dbl>
+    #>  1 F     Emma        193138
+    #>  2 F     Olivia      184966
+    #>  3 F     Sophia      173341
+    #>  4 F     Isabella    159570
+    #>  5 F     Ava         153414
+    #>  6 M     Noah        184977
+    #>  7 M     Liam        182646
+    #>  8 M     William     155326
+    #>  9 M     Mason       152944
+    #> 10 M     Jacob       150145
 
 #### Visualize
 
@@ -88,18 +121,18 @@ tbl_names_popular |>
   # Reorder the names by number of births
   mutate(name = fct_reorder(name, nb_births)) |>
   # Initialize a ggplot for name vs. nb_births
-  ggplot(aes(x = ___, y = ___)) +
+  ggplot(aes(x = nb_births, y = name)) +
   # Add a column plot layer
   geom_col() +
   # Facet the plots by sex
-  facet_wrap(~ ___, scales = "free_y") +
+  facet_wrap(~ sex, scales = "free_y") +
   # Add labels (title, subtitle, caption, x, y)
   labs(
-    title = '___',
-    subtitle = '___',
-    caption = '___',
-    x = '___',
-    y = '___'
+    title = 'Most Popular US Baby Names',
+    subtitle = 'Most popular names of decade are blah and blah',
+    caption = 'Source: US Baby Names',
+    x = 'Number of Births',
+    y = 'Names'
   ) +
   # Fix the x-axis scale 
   scale_x_continuous(
@@ -111,6 +144,8 @@ tbl_names_popular |>
     plot.title.position = 'plot'
   )
 ```
+
+<img src="img/question-1-visualize-1.png" width="100%" style="display: block; margin: auto;" />
 
 ### Question 2: \[Trendy Names\] What are trendy names?
 
@@ -166,6 +201,8 @@ tbl_names_popular_trendy = tbl_names |>
 tbl_names_popular_trendy
 ```
 
+    #> Error: The pipe operator requires a function call as RHS (<text>:3:3)
+
 |                                                                                                                                                                                                                                                                                                                                       |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Note**                                                                                                                                                                                                                                                                                                                              |
@@ -198,6 +235,8 @@ plot_trends_in_name <- function(my_name) {
 plot_trends_in_name("Steve")
 plot_trends_in_name("Barbara")
 ```
+
+    #> Error: The pipe operator requires a function call as RHS (<text>:4:5)
 
 ### Question 3: \[Exploring Letter Popularity\] What makes certain letters more popular in names?
 
@@ -232,6 +271,8 @@ tbl_names = tbl_names |>
 tbl_names
 ```
 
+    #> Error: The pipe operator requires a function call as RHS (<text>:5:3)
+
 Begin by computing the distribution of births across year and sex by
 first letter of a name.
 
@@ -248,6 +289,8 @@ tbl_names_by_letter = tbl_names |>
   
 tbl_names_by_letter
 ```
+
+    #> Error: The pipe operator requires a function call as RHS (<text>:3:3)
 
 #### Visualize
 
@@ -285,6 +328,8 @@ tbl_names_by_letter |>
   )
 ```
 
+    #> Error in eval(expr, envir, enclos): object 'tbl_names_by_letter' not found
+
 Write a function that plot trends in the percentage of births for all
 names starting with a specific first letter.
 
@@ -313,6 +358,8 @@ plot_trends_in_letter <- function(my_letter) {
 
 plot_trends_in_letter("S")
 ```
+
+    #> Error in plot_trends_in_letter("S"): object 'tbl_names_by_letter' not found
 
 |                                                                                                                                                                                                                                                                                         |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -350,6 +397,8 @@ tbl_names_by_first_and_last_letter = tbl_names |>
 tbl_names_by_first_and_last_letter
 ```
 
+    #> Error: The pipe operator requires a function call as RHS (<text>:18:1)
+
 #### Visualize
 
 Now, you will visualize the distribution of `pct_births` by
@@ -381,6 +430,8 @@ tbl_names_by_first_and_last_letter |>
     axis.ticks = element_blank()
   )
 ```
+
+    #> Error in eval(expr, envir, enclos): object 'tbl_names_by_first_and_last_letter' not found
 
 ### Question 5: \[Vowels vs Consonants\] Are there naming trends in usage of vowels and consonants?
 
@@ -433,6 +484,8 @@ tbl_names_vowel_consonant <- tbl_names |>
 tbl_names_vowel_consonant
 ```
 
+    #> Error: The pipe operator requires a function call as RHS (<text>:27:1)
+
 #### Visualize
 
 Now, you will create a visualization to display the trends in the usage
@@ -475,6 +528,8 @@ tbl_names_vowel_consonant |>
     legend.position = 'bottom'
   )
 ```
+
+    #> Error in eval(expr, envir, enclos): object 'tbl_names_vowel_consonant' not found
 
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
